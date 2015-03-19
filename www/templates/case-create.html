@@ -1,18 +1,18 @@
-<div class="modal slide-in-up" ng-controller="CaseCreateCtrl">
+<div class="modal slide-in-up" ng-controller="CaseCreateCtrl as create">
   <header class="bar bar-header bar-secondary">
-    <button class="button button-clear button-primary" ng-click="close()">Cancel</button>
+    <button class="button button-clear button-primary" ng-click="create.close()">Cancel</button>
     <h1 class="title">New Item</h1>
-    <button class="button button-positive" ng-click="createNew()">Done</button>
+    <button class="button button-positive" ng-click="create.createNew()">Done</button>
   </header>
   <ion-content class="padding has-header">
     <div>
-        <input type="text" placeholder="Why does my dog..." ng-model="data.item" />
+        <input type="text" placeholder="Why does my dog..." ng-model="create.data.item" />
     </div>
-    <div ng-if="data.image">
+    <div ng-if="create.data.image">
         <div class="img-preview">
-            <thumbnail-view image="data.image"></thumbnail-view>
+            <thumbnail-view image="create.data.image"></thumbnail-view>
         </div>
     </div>
-    <div><button class="button button-calm icon-right ion-camera" ng-click="uploadImage()">Take Picture</div></div>
+    <div><button class="button button-calm icon-right ion-camera" ng-click="create.captureImage()">Take Picture</div></div>
   </ion-content>
 </div>

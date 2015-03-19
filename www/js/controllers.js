@@ -1,28 +1,30 @@
 angular.module('dogapp.controllers', ['dogapp.services'])
-    .controller('RegisterCtrl', function($rootScope, $scope, $state, authService, userService, notifyService) {
-        $scope.user = {
+    .controller('RegisterCtrl', function($state, authService, userService, notifyService) {
+        var vm = this;
+
+        vm.user = {
             email: '',
             password: ''
         };
 
-        $scope.createUser = function() {
+        vm.createUser = function() {
             notifyService.show('Please wait... Registering');
 
-            if (!$scope.user.email || !$scope.user.password) {
+            if (!vm.user.email || !vm.user.password) {
                 notifyService.notify('Please enter valid credentials');
                 return false;
             }
 
-            authService.$createUser($scope.user)
+            authService.$createUser(vm.user)
                 .then(function(user) {
                     var usersRef = fb.child('users/' + user.uid);
                     usersRef.set({
-                        email: $scope.user.email,
+                        email: vm.user.email,
                         created: Date.now(),
                         updated: Date.now()
                     });
 
-                    return authService.$authWithPassword($scope.user);
+                    return authService.$authWithPassword(vm.user);
                 })
                 .then(function(auth) {
                     notifyService.hide();
@@ -34,21 +36,23 @@ angular.module('dogapp.controllers', ['dogapp.services'])
                 });
         }
     })
-    .controller('SignInCtrl', function($rootScope, $scope, $state, authService, userService, notifyService) {
-        $scope.user = {
+    .controller('SignInCtrl', function($state, authService, userService, notifyService) {
+        var vm = this;
+
+        vm.user = {
             email: '',
             password: ''
         };
 
-        $scope.validateUser = function() {
+        vm.validateUser = function() {
             notifyService.show('Please wait... Authenticating');
 
-            if (!$scope.user.email || !$scope.user.password) {
+            if (!vm.user.email || !vm.user.password) {
                 notifyService.notify('Please enter valid credentials');
                 return false;
             }
 
-            authService.$authWithPassword($scope.user)
+            authService.$authWithPassword(vm.user)
                 .then(function(auth) {
                     notifyService.hide();
                     userService.uid(auth.uid);
@@ -60,34 +64,36 @@ angular.module('dogapp.controllers', ['dogapp.services'])
                 });
         }
     })
-    .controller('CaseListCtrl', function($rootScope, $scope, $filter, $ionicModal, caseService, userService, notifyService) {
+    .controller('CaseListCtrl', function($ionicModal, caseService, userService, notifyService) {
+        var vm = this;
+
         notifyService.show('Please wait... Processing');
 
         var ref = fb.child('cases')
             .orderByChild('uid')
             .equalTo(userService.uid());
 
-        $scope.list = new caseService(ref);
-        $scope.list.$loaded(function() {
+        vm.list = new caseService(ref);
+        vm.list.$loaded(function() {
             notifyService.hide();
         });
 
         $ionicModal.fromTemplateUrl('templates/case-create.html', function(modal) {
-            $scope.newTemplate = modal;
+            vm.newTemplate = modal;
         });
 
-        $scope.newTask = function() {
-            $scope.newTemplate.show();
+        vm.newTask = function() {
+            vm.newTemplate.show();
         };
 
-        $scope.markCompleted = function(key) {
+        vm.markCompleted = function(key) {
             notifyService.show('Please wait... Updating List');
 
-            var item = $scope.list.$getRecord(key);
+            var item = vm.list.$getRecord(key);
             item.isCompleted = true;
             item.updated = Date.now();
 
-            $scope.list.$save(item)
+            vm.list.$save(item)
                 .then(function() {
                     notifyService.hide();
                     notifyService.notify('Successfully updated');
@@ -97,11 +103,11 @@ angular.module('dogapp.controllers', ['dogapp.services'])
                 });
         };
 
-        $scope.deleteItem = function(key) {
+        vm.deleteItem = function(key) {
             notifyService.show('Please wait... Deleting from List');
 
-            var item = $scope.list.$getRecord(key);
-            $scope.list.$remove(item)
+            var item = vm.list.$getRecord(key);
+            vm.list.$remove(item)
                 .then(function() {
                     notifyService.hide();
                     notifyService.notify('Successfully deleted');
@@ -111,19 +117,21 @@ angular.module('dogapp.controllers', ['dogapp.services'])
                 });
         };
     })
-    .controller('CaseCreateCtrl', function($rootScope, $scope, $ionicHistory, $cordovaCamera, $firebaseArray, userService, notifyService) {
-        $scope.data = {
+    .controller('CaseCreateCtrl', function($scope, $ionicHistory, $cordovaCamera, $firebaseArray, userService, notifyService) {
+        var vm = this;
+
+        vm.data = {
             item: '',
             image: null
         };
 
         $ionicHistory.clearHistory();
 
-        $scope.close = function() {
+        vm.close = function() {
             $scope.modal.hide();
         };
 
-        $scope.uploadImage = function() {
+        vm.captureImage = function() {
             var options = {
                 quality: 90,
                 destinationType: Camera.DestinationType.DATA_URL,
@@ -139,7 +147,7 @@ angular.module('dogapp.controllers', ['dogapp.services'])
 
             $cordovaCamera.getPicture(options)
                 .then(function(imageData) {
-                    $scope.data.image = imageData;
+                    vm.data.image = imageData;
                     $cordovaCamera.cleanup();
                 })
                 .catch(function(error) {
@@ -147,7 +155,7 @@ angular.module('dogapp.controllers', ['dogapp.services'])
                 });
         };
 
-        $scope.createNew = function() {
+        vm.createNew = function() {
             var item = this.data.item,
                 image = this.data.image;
 
@@ -168,7 +176,7 @@ angular.module('dogapp.controllers', ['dogapp.services'])
             var casesRef = fb.child('cases');
             casesRef.push(data);
 
-            $scope.data = {
+            vm.data = {
                 item: '',
                 image: null
             };
@@ -176,23 +184,25 @@ angular.module('dogapp.controllers', ['dogapp.services'])
             notifyService.hide();
         };
     })
-    .controller('CaseCompletedCtrl', function($rootScope, $scope, $filter, caseService, userService, notifyService) {
+    .controller('CaseCompletedCtrl', function(caseService, userService, notifyService) {
+        var vm = this;
+
         notifyService.show('Please wait... Processing');
 
         var ref = fb.child('cases')
             .orderByChild('uid')
             .equalTo(userService.uid());
 
-        $scope.list = new caseService(ref);
-        $scope.list.$loaded(function() {
+        vm.list = new caseService(ref);
+        vm.list.$loaded(function() {
             notifyService.hide();
         });
 
-        $scope.deleteItem = function(key) {
+        vm.deleteItem = function(key) {
             notifyService.show('Please wait... Deleting from List');
 
-            var item = $scope.list.$getRecord(key);
-            $scope.list.$remove(item)
+            var item = vm.list.$getRecord(key);
+            vm.list.$remove(item)
                 .then(function() {
                     notifyService.hide();
                     notifyService.notify('Successfully deleted');

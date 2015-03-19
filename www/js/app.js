@@ -23,7 +23,7 @@ angular.module('dogapp', [
                 views: {
                     'auth-signin': {
                         templateUrl: 'templates/auth-signin.html',
-                        controller: 'SignInCtrl'
+                        controller: 'SignInCtrl as signin'
                     }
                 }
             })
@@ -32,7 +32,7 @@ angular.module('dogapp', [
                 views: {
                     'auth-register': {
                         templateUrl: 'templates/auth-register.html',
-                        controller: 'RegisterCtrl'
+                        controller: 'RegisterCtrl as register'
                     }
                 }
             })
@@ -51,7 +51,7 @@ angular.module('dogapp', [
                 views: {
                     'case-list': {
                         templateUrl: 'templates/case-list.html',
-                        controller: 'CaseListCtrl'
+                        controller: 'CaseListCtrl as case'
                     }
                 }
             })
@@ -60,7 +60,7 @@ angular.module('dogapp', [
                 views: {
                     'case-completed': {
                         templateUrl: 'templates/case-completed.html',
-                        controller: 'CaseCompletedCtrl'
+                        controller: 'CaseCompletedCtrl as complete'
                     }
                 }
             });

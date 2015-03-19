@@ -1,0 +1,32 @@
+<ion-view view-title="My Cases">
+  <ion-nav-buttons side="left">
+    <button class="button button-clear" ng-click="$ionicGoBack($event)" ng-show="hasHistory()">
+        <em class="ion-chevron-left"></em>&nbsp;Back</button>
+     </button>
+  </ion-nav-buttons>
+  <ion-nav-buttons side="right">
+    <button class="button button-outline button-energized icon-right ion-log-out" ng-click="logout()">Logout&nbsp;</button>
+  </ion-nav-buttons>
+  <ion-content class="has-header padding" has-tabs="true" on-refresh="onRefresh()">
+    <button class="button button-outline button-positive icon ion-plus" ng-click="newTask()">&nbsp;New</button>
+
+    <div class="card" ng-repeat="item in list.completed(false)" id="{{item.$id}}" >
+      <div class="item item-text-wrap">
+        <ul class="actions">
+          <li class="ion-checkmark-circled icon-actions" ng-click="markCompleted('{{item.$id}}')"></li>
+          <li class="ion-trash-b icon-actions" ng-click="deleteItem('{{item.$id}}')"></li>
+        </ul>
+        <div class="wdmd-title">Why does my dog...</div>
+        <div class="wdmd-item">{{item.item}}</div>
+        <div ng-if="item.image">
+            <thumbnail-view image="item.image"></thumbnail-view>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="item item-text-wrap" ng-show="list.completed(false).length === 0">
+        <span>No items in your case list. Click <a href="javascript:void(0);" ng-click="newTask()">here</a> and create one.</span>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>

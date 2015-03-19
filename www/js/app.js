@@ -4,7 +4,8 @@ angular.module('dogapp', [
         'firebase',
         'dogapp.controllers',
         'dogapp.directives',
-        'dogapp.services'
+        'dogapp.services',
+        'dogapp.recorder'
     ])
     .config(function($stateProvider, $urlRouterProvider) {
         $stateProvider

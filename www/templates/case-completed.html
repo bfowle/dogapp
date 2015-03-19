@@ -11,7 +11,7 @@
     <div class="card" ng-repeat="item in complete.list.completed(true)">
       <div class="item item-text-wrap">
         <ul class="actions">
-          <li class="ion-trash-b icon-actions" ng-click="complete.deleteItem('{{item.$id}}')"></li>
+          <li class="icon ion-trash-b icon-actions" ng-click="complete.deleteItem('{{item.$id}}')"></li>
         </ul>
         <div>{{item.item}}</div>
       </div>

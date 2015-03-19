@@ -1,0 +1,9 @@
+<ion-scroll zooming="true" direction="y" style="width: 100%;">
+    <section class="list">
+        <a class="button button-outline ion-record button-royal item" ng-click="start()" ng-if="!isRecording" style="width: 100%;"></a>
+        <a class="button button-outline ion-stop button-royal item" ng-click="stop()" ng-if="isRecording" style="width: 100%;"></a>
+        <progress ng-if="isRecording"></progress>
+        <video ng-show="isRecording" style="width: 100%;" autoplay></video>
+    </section>
+</ion-scroll>
+

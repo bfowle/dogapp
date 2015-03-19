@@ -1,3 +1,5 @@
+'use strict';
+
 angular.module('dogapp.controllers', ['dogapp.services'])
     .controller('RegisterCtrl', function($state, authService, userService, notifyService) {
         var vm = this;
@@ -117,7 +119,7 @@ angular.module('dogapp.controllers', ['dogapp.services'])
                 });
         };
     })
-    .controller('CaseCreateCtrl', function($scope, $ionicHistory, $cordovaCamera, $firebaseArray, userService, notifyService) {
+    .controller('CaseCreateCtrl', function($scope, $window, $ionicHistory, $cordovaCamera, $firebaseArray, userService, notifyService, recorderService) {
         var vm = this;
 
         vm.data = {
@@ -129,6 +131,44 @@ angular.module('dogapp.controllers', ['dogapp.services'])
 
         vm.close = function() {
             $scope.modal.hide();
+        };
+
+        vm.recordSuccess = function(record){
+            vm.audioTrack = record.audioUrl.replace('data:audio/wav;base64,','')
+                .replace('data:video/webm;base64,','')
+            vm.videoTrack = record.videoUrl;
+
+            console.log('record success');
+
+            //vm.cancel = function() {
+            //    $scope.modal.hide();
+            //};
+
+            //$scope.save = function(meta) {
+            //    Record.buildData(meta,record)
+            //    .then(Record.save)
+            //    .then(function(){
+            //    $scope.modal.hide();
+            //    Toast.info('record saved !');
+            //    })
+            //    .catch(function(err){
+            //    Toast.error(err.message);
+            //    });
+            //};
+
+            //$ionicModal.fromTemplateUrl('app/record/recordPreview.tpl.html', {
+            //    scope: $scope,
+            //    animation: 'slide-in-up'
+            //})
+            //.then(function(modal) {
+            //    $scope.modal = modal;
+            //    $scope.modal.show();
+            //});
+        };
+
+        vm.recordError = function(err) {
+            console.log(err.message);
+            //Toast.error(err.message);
         };
 
         vm.captureImage = function() {
@@ -153,6 +193,27 @@ angular.module('dogapp.controllers', ['dogapp.services'])
                 .catch(function(error) {
                     console.error(error);
                 });
+        };
+
+        vm.captureStream = function() {
+            /*
+            var URL = window.URL || window.webkitURL;
+            var getUserMedia = navigator.getUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
+
+            if (getUserMedia) {
+                getUserMedia = getUserMedia.bind(navigator);
+            }
+
+            getUserMedia({
+                video: true,
+                audio: true
+            }, function(stream) {
+                console.log('SUCCESS');
+                console.log(stream);
+            }, function(error) {
+                console.log('ERROR: ' + error);
+            });
+            */
         };
 
         vm.createNew = function() {

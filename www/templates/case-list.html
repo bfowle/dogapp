@@ -13,8 +13,8 @@
     <div class="card" ng-repeat="item in case.list.completed(false)" id="{{item.$id}}" >
       <div class="item item-text-wrap">
         <ul class="actions">
-          <li class="ion-checkmark-circled icon-actions" ng-click="case.markCompleted('{{item.$id}}')"></li>
-          <li class="ion-trash-b icon-actions" ng-click="case.deleteItem('{{item.$id}}')"></li>
+          <li class="icon ion-checkmark-circled icon-actions" ng-click="case.markCompleted('{{item.$id}}')"></li>
+          <li class="icon ion-trash-b icon-actions" ng-click="case.deleteItem('{{item.$id}}')"></li>
         </ul>
         <div class="wdmd-title">Why does my dog...</div>
         <div class="wdmd-item">{{item.item}}</div>

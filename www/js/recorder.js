@@ -8,80 +8,19 @@ navigator.getUserMedia = navigator.getUserMedia ||
 angular.module('dogapp.recorder', [])
     .factory('recorderService', function($q, $window) {
         var record,
-            stream,
             meta;
 
-        var Record = function() {
+        var Record = function(stream) {
             var self = this;
 
-            this.video = $window.RecordRTC(stream, {
-                type: 'video'
-            });
+            this.video = $window.RecordRTC(stream, {type: 'video'});
 
             this.audio = $window.RecordRTC(stream, {
                 onAudioProcessStarted: function() {
                     self.video.startRecording();
                 }
             });
-            this.audio.startRecording();
         };
-
-        function getSources() {
-            var deferred = $q.defer();
-
-            MediaStreamTrack.getSources(function(sources) {
-                var videoSrc;
-
-                for (var i in sources) {
-                    var src = sources[i];
-                    if (src.kind === 'video') {
-                        if (src.facing === 'environment') {
-                            videoSrc = src;
-                            break;
-                        }
-                        videoSrc = videoSrc || src;
-                    }
-                }
-
-                deferred.resolve({
-                    audio: true,
-                    video: {
-                        optional: [{
-                            sourceId: videoSrc.id
-                        }]
-                    }
-                });
-            });
-
-            return deferred.promise;
-        }
-
-        function getStream(constraints) {
-            var deferred = $q.defer();
-
-            navigator.getUserMedia(constraints, function(stream) {
-                deferred.resolve(stream);
-            }, function(error) {
-                console.log(error);
-            });
-
-            return deferred.promise;
-        }
-
-        /**
-         * @TODO clean this process up and find most appropriate place to initiate
-         */
-        getSources()
-            .then(function(sources) {
-                return getStream(sources);
-            })
-            .then(function(str) {
-                stream = str;
-            })
-            .catch(function(error) {
-                console.log(error);
-                //notifyService.notify(error);
-            });
 
         Record.prototype.getAudioUrl = function() {
             var deferred = $q.defer(),
@@ -106,7 +45,7 @@ angular.module('dogapp.recorder', [])
         };
 
         return {
-            start: function(stream, options) {
+            start: function(stream) {
                 record = new Record(stream);
                 return $window.URL.createObjectURL(stream);
             },
@@ -121,8 +60,8 @@ angular.module('dogapp.recorder', [])
                     });
                 return deferred.promise;
             },
-            getStream: function() {
-                return stream;
+            record: function() {
+                record.audio.startRecording();
             },
             setMeta: function(metaData) {
                 meta = metaData;
@@ -135,24 +74,83 @@ angular.module('dogapp.recorder', [])
             templateUrl: 'templates/recorder.html',
             scope: {
                 onrecorded: '=',
-                onerror: '='
+                onerror: '=',
+                show: '='
             },
             link: function link(scope, element, attrs) {
                 var mediaElement = element.find('video')[0];
+                mediaElement.muted = true;
+                mediaElement.controls = false;
 
-                scope.type = {
-                    'audio': true,
-                    'video': true
+                scope.stream = null;
+                scope.isRecording = false;
+
+                var constraints = {
+                    audio: true,
+                    video: true
                 };
 
-                scope.start = function() {
+                scope.setStream = function(constraints) {
+                    //mediaElement.pause();
+
+                    navigator.getUserMedia(constraints, function(stream) {
+                        scope.$apply(function() {
+                            scope.stream = stream;
+
+                            var url = recorderService.start(scope.stream);
+                            mediaElement.src = url;
+                            mediaElement.play();
+                        });
+                    }, function(error) {
+                        console.log(error);
+                    });
+                };
+
+                var videoSources = {},
+                    curSource;
+
+                MediaStreamTrack.getSources(function(sources) {
+                    for (var i in sources) {
+                        var src = sources[i];
+                        if (src.kind === 'video') {
+                            if (src.facing === 'environment' || src.facing === 'user') {
+                                videoSources[src.facing] = src;
+                            } else {
+                                videoSources.generic = src;
+                            }
+                        }
+                    }
+
+                });
+
+                scope.init = function() {
+                    curSource = videoSources.environment || videoSources.generic;
+
+                    constraints.video = {
+                        optional: [{
+                            sourceId: curSource.id
+                        }]
+                    };
+
+                    scope.setStream(constraints);
+                };
+
+                scope.$watch(function() {
+                    return scope.show;
+                }, function(newValue, oldValue) {
+                    if (newValue !== oldValue) {
+                        if (newValue === true) {
+                            scope.init();
+                        } else {
+                            //scope.hide();
+                        }
+                    }
+                });
+
+                scope.record = function() {
                     scope.isRecording = true;
 
-                    var url = recorderService.start(recorderService.getStream(), scope.type);
-                    mediaElement.src = url;
-                    mediaElement.muted = true;
-                    mediaElement.controls = false;
-                    mediaElement.play();
+                    recorderService.record();
                 };
 
                 scope.stop = function() {
@@ -161,10 +159,36 @@ angular.module('dogapp.recorder', [])
                     recorderService.stop()
                         .then(function(record) {
                             scope.onrecorded(record);
+                            //mediaElement.controls = true;
                         })
                         .catch(function(err) {
                             scope.onerror(err);
                         });
+                };
+
+                scope.toggle = function() {
+                    if (!scope.isRecording) {
+                        scope.record();
+                    } else {
+                        scope.stop();
+                    }
+                };
+
+                scope.canSwap = function() {
+                    return !!(videoSources.environment && videoSources.user);
+                };
+
+                scope.swap = function() {
+                    curSource = curSource.facing === 'environment' ? videoSources.user : videoSources.environment;
+
+                    constraints.video = {
+                        optional: [{
+                            sourceId: curSource.id
+                        }]
+                    };
+                    console.log(curSource);
+
+                    scope.setStream(constraints);
                 };
             }
         };

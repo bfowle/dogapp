@@ -1,69 +1,35 @@
 'use strict';
 
 angular.module('dogapp.controllers', ['dogapp.services'])
-    .controller('RegisterCtrl', function($state, authService, userService, notifyService) {
+    .controller('SignInCtrl', function($state, $cordovaOauth, authService, userService, notifyService) {
         var vm = this;
-
-        vm.user = {
-            email: '',
-            password: ''
-        };
-
-        vm.createUser = function() {
-            notifyService.show('Please wait... Registering');
-
-            if (!vm.user.email || !vm.user.password) {
-                notifyService.notify('Please enter valid credentials');
-                return false;
-            }
-
-            authService.$createUser(vm.user)
-                .then(function(user) {
-                    var usersRef = fb.child('users/' + user.uid);
-                    usersRef.set({
-                        email: vm.user.email,
-                        created: Date.now(),
-                        updated: Date.now()
-                    });
-
-                    return authService.$authWithPassword(vm.user);
-                })
-                .then(function(auth) {
-                    notifyService.hide();
-                    userService.uid(auth.uid);
-                    $state.go('case.list');
-                })
-                .catch(function(error) {
-                    notifyService.notify(error);
-                });
-        }
-    })
-    .controller('SignInCtrl', function($state, authService, userService, notifyService) {
-        var vm = this;
-
-        vm.user = {
-            email: '',
-            password: ''
-        };
 
         vm.validateUser = function() {
             notifyService.show('Please wait... Authenticating');
 
-            if (!vm.user.email || !vm.user.password) {
-                notifyService.notify('Please enter valid credentials');
-                return false;
-            }
+            var OAUTH2_CLIENT_ID = '599376156128-1i8b4kdki9v9tll8m5akbih9tu4g1hkc.apps.googleusercontent.com',
+                OAUTH2_SCOPES = ['https://www.googleapis.com/auth/plus.me'/*, 'https://www.googleapis.com/auth/youtube'*/];
 
-            authService.$authWithPassword(vm.user)
-                .then(function(auth) {
-                    notifyService.hide();
-                    userService.uid(auth.uid);
-                    $state.go('case.list');
-                })
-                .catch(function(error) {
-                    notifyService.hide();
-                    console.error('ERROR: ' + error);
+            $cordovaOauth.google(OAUTH2_CLIENT_ID, OAUTH2_SCOPES)
+                .then(function(result) {
+                    authService.$authWithOAuthToken('google', result.access_token)
+                        .then(function(auth) {
+                            userService.uid(auth.uid);
+                        })
+                        .catch(function(error) {
+                            console.error('ERROR: ' + error);
+                        });
+                }, function(error) {
+                    console.log(error);
                 });
+
+            //authService.$authWithOAuthPopup('google')
+            //    .then(function(auth) {
+            //        userService.uid(auth.uid);
+            //    })
+            //    .catch(function(error) {
+            //        console.error('ERROR: ' + error);
+            //    });
         }
     })
     .controller('CaseListCtrl', function($ionicModal, caseService, userService, notifyService) {
@@ -119,8 +85,8 @@ angular.module('dogapp.controllers', ['dogapp.services'])
                 });
         };
     })
-    .controller('CaseCreateCtrl', function($scope, $ionicHistory, $cordovaCamera, $cordovaOauth, $firebaseArray,
-                                           userService, notifyService, recorderService) {
+    .controller('CaseCreateCtrl', function($scope, $ionicHistory, $cordovaCamera, $firebaseArray, userService,
+                                           notifyService, recorderService) {
         var vm = this;
 
         vm.data = {
@@ -132,16 +98,6 @@ angular.module('dogapp.controllers', ['dogapp.services'])
 
         $ionicHistory.clearHistory();
 
-        var OAUTH2_CLIENT_ID = '599376156128-1i8b4kdki9v9tll8m5akbih9tu4g1hkc.apps.googleusercontent.com',
-            OAUTH2_SCOPES = ['https://www.googleapis.com/auth/youtube'];
-
-        $cordovaOauth.google(OAUTH2_CLIENT_ID, OAUTH2_SCOPES)
-            .then(function(result) {
-                console.log(JSON.stringify(result));
-            }, function(error) {
-                console.log(error);
-            });
-
         $scope.$on('modal.shown', function() {
             vm.showRecorder = true;
         });
@@ -151,12 +107,21 @@ angular.module('dogapp.controllers', ['dogapp.services'])
         };
 
         vm.recordSuccess = function(record) {
-            vm.audioTrack = record.audioUrl.replace('data:audio/wav;base64,','');
-            vm.videoTrack = record.videoUrl.replace('data:video/webm;base64,','');
+            vm.audioTrack = record.audioUrl.replace('data:audio/wav;base64,', '');
+            vm.videoTrack = record.videoUrl.replace('data:video/webm;base64,', '');
         };
 
         vm.recordError = function(err) {
             console.log(err.message);
+        };
+
+        vm.snapSuccess = function(image) {
+            vm.data.image = image.replace(/data\:image\/(png|jpeg);base64,/g, '');
+            vm.showRecorder = false;
+        };
+
+        vm.snapRetake = function() {
+            vm.data.image = null;
         };
 
         vm.createNew = function() {

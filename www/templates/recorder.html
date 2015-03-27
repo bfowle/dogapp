@@ -1,8 +1,14 @@
 <ion-scroll zooming="true" direction="y" style="width: 100%;">
     <section class="list">
-        <video style="width: 100%;" autoplay></video>
+        <div ng-show="show">
+            <video id="video" style="width: 100%;" autoplay></video>
+            <canvas id="canvas" style="display: none;"></canvas>
+        </div>
         <div class="button-bar">
-            <button class="button button-outline button-assertive" ng-class="{true: 'ion-stop', false: 'ion-record'}[isRecording]" ng-click="toggle()"></button>
+            <!--<button class="button button-outline button-assertive" ng-class="{true: 'ion-stop', false: 'ion-record'}[isRecording]" ng-click="toggle()"></button>-->
+
+            <button class="button button-outline button-assertive" ng-class="{true: 'ion-camera', false: 'ion-shuffle'}[show]" ng-click="snapToggle()"></button>
+
             <button class="button button-outline button-positive ion-arrow-swap" ng-if="canSwap()" ng-click="swap()"></button>
         </div>
         <progress ng-if="isRecording"></progress>

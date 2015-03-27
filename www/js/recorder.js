@@ -73,8 +73,10 @@ angular.module('dogapp.recorder', [])
             restrict: 'E',
             templateUrl: 'templates/recorder.html',
             scope: {
-                onrecorded: '=',
                 onerror: '=',
+                onrecorded: '=',
+                onsnapped: '=',
+                onretake: '=',
                 show: '='
             },
             link: function(scope, element, attrs) {
@@ -86,8 +88,8 @@ angular.module('dogapp.recorder', [])
                 scope.isRecording = false;
 
                 var constraints = {
-                    audio: true,
-                    video: true
+                    video: true,
+                    audio: false
                 };
 
                 scope.setStream = function(constraints) {
@@ -120,7 +122,6 @@ angular.module('dogapp.recorder', [])
                             }
                         }
                     }
-
                 });
 
                 scope.init = function() {
@@ -142,7 +143,7 @@ angular.module('dogapp.recorder', [])
                         if (newValue === true) {
                             scope.init();
                         } else {
-                            //scope.hide();
+                            scope.show = false;
                         }
                     }
                 });
@@ -173,6 +174,40 @@ angular.module('dogapp.recorder', [])
                         scope.stop();
                     }
                 };
+
+                scope.snap = function() {
+                    var width = 800;
+                    var height = 0;
+
+                    var video = document.getElementById('video');
+                    var canvas = document.getElementById('canvas');
+
+                    height = video.videoHeight / (video.videoWidth / width);
+                    if (isNaN(height)) {
+                        height = width / (4 / 3);
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    var context = canvas.getContext('2d');
+                    context.drawImage(video, 0, 0, width, height);
+
+                    var data = canvas.toDataURL('image/png');
+                    scope.onsnapped(data);
+                };
+
+                scope.retake = function() {
+                    scope.show = true;
+                    scope.onretake();
+                };
+
+                scope.snapToggle = function() {
+                    if (scope.show) {
+                        scope.snap();
+                    } else {
+                        scope.retake();
+                    }
+                }
 
                 scope.canSwap = function() {
                     return !!(videoSources.environment && videoSources.user);

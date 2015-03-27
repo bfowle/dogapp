@@ -5,15 +5,19 @@
     <button class="button button-positive" ng-click="create.createNew()">Done</button>
   </header>
   <ion-content class="padding has-header">
-    <div>
-        <input type="text" placeholder="Why does my dog..." ng-model="create.data.item" />
-    </div>
     <div ng-if="create.data.image">
         <div class="img-preview">
             <thumbnail-view image="create.data.image"></thumbnail-view>
         </div>
     </div>
-    <recorder show="create.showRecorder" onerror="create.recordError" onrecorded="create.recordSuccess"></recorder>
+    <recorder show="create.showRecorder"
+        onerror="create.recordError"
+        onrecorded="create.recordSuccess"
+        onsnapped="create.snapSuccess"
+        onretake="create.snapRetake"></recorder>
+    <div>
+        <input type="text" placeholder="Why does my dog..." ng-model="create.data.item" />
+    </div>
     <!--
     <div>
         <button class="button button-assertive icon-right ion-videocamera" ng-click="create.captureStream()">Record</button>

@@ -1,16 +1,8 @@
 <ion-view view-title="Sign In">
   <ion-content class="has-header padding">
     <div class="list">
-      <label class="item item-input">
-        <span class="input-label">Email</span>
-        <input type="email" ng-model="signin.user.email">
-      </label>
-      <label class="item item-input">
-        <span class="input-label">Password</span>
-        <input type="password" ng-model="signin.user.password">
-      </label>
-      <label class="item item-input">
-        <button class="button button-block button-positive" ng-click="signin.validateUser()">Sign In</button>
+      <label class="item item-input col-center">
+        <button class="button button-large button-positive icon-right ion-social-google" ng-click="signin.validateUser()">Sign In with&nbsp;</button>
       </label>
     </div>
   </ion-content>

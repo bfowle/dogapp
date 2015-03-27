@@ -28,15 +28,6 @@ angular.module('dogapp', [
                     }
                 }
             })
-            .state('auth.register', {
-                url: '/register',
-                views: {
-                    'auth-register': {
-                        templateUrl: 'templates/auth-register.html',
-                        controller: 'RegisterCtrl as register'
-                    }
-                }
-            })
             .state('case', {
                 url: '/case',
                 abstract: true,
@@ -68,7 +59,7 @@ angular.module('dogapp', [
 
         $urlRouterProvider.otherwise('/auth/signin');
     })
-    .run(function($rootScope, $state, $ionicPlatform, $ionicHistory, authService, FIREBASE_URL) {
+    .run(function($rootScope, $state, $ionicPlatform, $ionicHistory,  authService, userService, FIREBASE_URL) {
         $ionicPlatform.ready(function() {
             if (window.cordova && window.cordova.plugins.Keyboard) {
                 cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
@@ -76,12 +67,6 @@ angular.module('dogapp', [
             if (window.StatusBar) {
                 StatusBar.styleDefault();
             }
-
-            //$rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
-            //    if (error === 'AUTH_REQUIRED') {
-            //        $state.go('auth.signin');
-            //    }
-            //});
 
             $rootScope.hasHistory = function() {
                 return $ionicHistory.backView() !== null;

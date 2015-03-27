@@ -119,7 +119,8 @@ angular.module('dogapp.controllers', ['dogapp.services'])
                 });
         };
     })
-    .controller('CaseCreateCtrl', function($scope, $ionicHistory, $cordovaCamera, $firebaseArray, userService, notifyService, recorderService) {
+    .controller('CaseCreateCtrl', function($scope, $ionicHistory, $cordovaCamera, $cordovaOauth, $firebaseArray,
+                                           userService, notifyService, recorderService) {
         var vm = this;
 
         vm.data = {
@@ -130,6 +131,16 @@ angular.module('dogapp.controllers', ['dogapp.services'])
         vm.showRecorder = false;
 
         $ionicHistory.clearHistory();
+
+        var OAUTH2_CLIENT_ID = '599376156128-1i8b4kdki9v9tll8m5akbih9tu4g1hkc.apps.googleusercontent.com',
+            OAUTH2_SCOPES = ['https://www.googleapis.com/auth/youtube'];
+
+        $cordovaOauth.google(OAUTH2_CLIENT_ID, OAUTH2_SCOPES)
+            .then(function(result) {
+                console.log(JSON.stringify(result));
+            }, function(error) {
+                console.log(error);
+            });
 
         $scope.$on('modal.shown', function() {
             vm.showRecorder = true;

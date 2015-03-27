@@ -77,7 +77,7 @@ angular.module('dogapp.recorder', [])
                 onerror: '=',
                 show: '='
             },
-            link: function link(scope, element, attrs) {
+            link: function(scope, element, attrs) {
                 var mediaElement = element.find('video')[0];
                 mediaElement.muted = true;
                 mediaElement.controls = false;
@@ -91,7 +91,7 @@ angular.module('dogapp.recorder', [])
                 };
 
                 scope.setStream = function(constraints) {
-                    //mediaElement.pause();
+                    scope.stream && scope.stream.stop();
 
                     navigator.getUserMedia(constraints, function(stream) {
                         scope.$apply(function() {

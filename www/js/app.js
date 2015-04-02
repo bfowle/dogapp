@@ -9,34 +9,34 @@ angular.module('dogapp', [
     ])
     .config(function($stateProvider, $urlRouterProvider) {
         $stateProvider
-            .state('auth', {
-                url: '/auth',
-                abstract: true,
-                templateUrl: 'templates/auth-tabs.html',
-                resolve: {
-                    'currentAuth': ['authService', function(authService) {
-                        return authService.$waitForAuth();
-                    }]
-                }
-            })
-            .state('auth.signin', {
-                url: '/signin',
-                views: {
-                    'auth-signin': {
-                        templateUrl: 'templates/auth-signin.html',
-                        controller: 'SignInCtrl as signin'
-                    }
-                }
-            })
+            //.state('auth', {
+            //    url: '/auth',
+            //    abstract: true,
+            //    templateUrl: 'templates/auth-tabs.html',
+            //    resolve: {
+            //        'currentAuth': ['authService', function(authService) {
+            //            return authService.$waitForAuth();
+            //        }]
+            //    }
+            //})
+            //.state('auth.signin', {
+            //    url: '/signin',
+            //    views: {
+            //        'auth-signin': {
+            //            templateUrl: 'templates/auth-signin.html',
+            //            controller: 'SignInCtrl as signin'
+            //        }
+            //    }
+            //})
             .state('case', {
                 url: '/case',
                 abstract: true,
                 templateUrl: 'templates/case-tabs.html',
-                resolve: {
-                    'currentAuth': ['authService', function(authService) {
-                        return authService.$requireAuth();
-                    }]
-                }
+                //resolve: {
+                //    'currentAuth': ['authService', function(authService) {
+                //        return authService.$requireAuth();
+                //    }]
+                //}
             })
             .state('case.list', {
                 url: '/list',
@@ -57,9 +57,9 @@ angular.module('dogapp', [
                 }
             });
 
-        $urlRouterProvider.otherwise('/auth/signin');
+        $urlRouterProvider.otherwise('/case/list');
     })
-    .run(function($rootScope, $state, $ionicPlatform, $ionicHistory,  authService, userService, FIREBASE_URL) {
+    .run(function($rootScope, $state, $ionicPlatform, $ionicHistory, /*authService, */userService, FIREBASE_URL) {
         $ionicPlatform.ready(function() {
             if (window.cordova && window.cordova.plugins.Keyboard) {
                 cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
@@ -72,8 +72,8 @@ angular.module('dogapp', [
                 return $ionicHistory.backView() !== null;
             };
 
-            $rootScope.logout = function() {
-                authService.$unauth();
-            };
+            //$rootScope.logout = function() {
+            //    authService.$unauth();
+            //};
         });
     });

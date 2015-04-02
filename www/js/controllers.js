@@ -1,50 +1,96 @@
 'use strict';
 
+function guid() {
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+    }
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+        s4() + '-' + s4() + s4() + s4();
+}
+
 angular.module('dogapp.controllers', ['dogapp.services'])
-    .controller('SignInCtrl', function($state, $cordovaOauth, authService, userService, notifyService) {
-        var vm = this;
+    //.controller('RegisterCtrl', function($state, authService, userService, notifyService) {
+    //    var vm = this;
 
-        vm.validateUser = function() {
-            notifyService.show('Please wait... Authenticating');
+    //    vm.user = {
+    //        email: '',
+    //        password: ''
+    //    };
 
-            var OAUTH2_CLIENT_ID = '599376156128-1i8b4kdki9v9tll8m5akbih9tu4g1hkc.apps.googleusercontent.com',
-                OAUTH2_SCOPES = ['https://www.googleapis.com/auth/plus.me'/*, 'https://www.googleapis.com/auth/youtube'*/];
+    //    vm.createUser = function() {
+    //        notifyService.show('Please wait... Registering');
 
-            $cordovaOauth.google(OAUTH2_CLIENT_ID, OAUTH2_SCOPES)
-                .then(function(result) {
-                    authService.$authWithOAuthToken('google', result.access_token)
-                        .then(function(auth) {
-                            userService.uid(auth.uid);
-                        })
-                        .catch(function(error) {
-                            console.error('ERROR: ' + error);
-                        });
-                }, function(error) {
-                    console.log(error);
-                });
+    //        if (!vm.user.email || !vm.user.password) {
+    //            notifyService.notify('Please enter valid credentials');
+    //            return false;
+    //        }
 
-            //authService.$authWithOAuthPopup('google')
-            //    .then(function(auth) {
-            //        userService.uid(auth.uid);
-            //    })
-            //    .catch(function(error) {
-            //        console.error('ERROR: ' + error);
-            //    });
-        }
-    })
+    //        authService.$createUser(vm.user)
+    //            .then(function(user) {
+    //                var usersRef = fb.child('users/' + user.uid);
+    //                usersRef.set({
+    //                    email: vm.user.email,
+    //                    created: Date.now(),
+    //                    updated: Date.now()
+    //                });
+
+    //                return authService.$authWithPassword(vm.user);
+    //            })
+    //            .then(function(auth) {
+    //                notifyService.hide();
+    //                userService.uid(auth.uid);
+    //                $state.go('case.list');
+    //            })
+    //            .catch(function(error) {
+    //                notifyService.notify(error);
+    //            });
+    //    }
+    //})
+    //.controller('SignInCtrl', function($state, authService, userService, notifyService) {
+    //    var vm = this;
+
+    //    vm.user = {
+    //        email: '',
+    //        password: ''
+    //    };
+
+    //    vm.validateUser = function() {
+    //        notifyService.show('Please wait... Authenticating');
+
+    //        if (!vm.user.email || !vm.user.password) {
+    //            notifyService.notify('Please enter valid credentials');
+    //            return false;
+    //        }
+
+    //        authService.$authWithPassword(vm.user)
+    //            .then(function(auth) {
+    //                notifyService.hide();
+    //                userService.uid(auth.uid);
+    //                $state.go('case.list');
+    //            })
+    //            .catch(function(error) {
+    //                notifyService.hide();
+    //                console.error('ERROR: ' + error);
+    //            });
+    //    }
+    //})
     .controller('CaseListCtrl', function($ionicModal, caseService, userService, notifyService) {
         var vm = this;
 
-        notifyService.show('Please wait... Processing');
+        //notifyService.show('Please wait... Processing');
 
-        var ref = fb.child('cases')
-            .orderByChild('uid')
-            .equalTo(userService.uid());
+        //var ref = fb.child('cases')
+        //    .orderByChild('uid')
+        //    .equalTo(userService.uid());
 
-        vm.list = new caseService(ref);
-        vm.list.$loaded(function() {
-            notifyService.hide();
-        });
+        //vm.list = new caseService(ref);
+        //vm.list.$loaded(function() {
+        //    notifyService.hide();
+        //});
+
+        vm.list = caseService;
 
         $ionicModal.fromTemplateUrl('templates/case-create.html', function(modal) {
             vm.newTemplate = modal;
@@ -57,36 +103,43 @@ angular.module('dogapp.controllers', ['dogapp.services'])
         vm.markCompleted = function(key) {
             notifyService.show('Please wait... Updating List');
 
-            var item = vm.list.$getRecord(key);
+            //var item = vm.list.$getRecord(key);
+            var item = vm.list.getCase(key);
             item.isCompleted = true;
             item.updated = Date.now();
 
-            vm.list.$save(item)
-                .then(function() {
-                    notifyService.hide();
-                    notifyService.notify('Successfully updated');
-                }, function(error) {
-                    notifyService.hide();
-                    notifyService.notify('Oops! something went wrong. Try again later');
-                });
+            notifyService.hide();
+
+            //vm.list.$save(item)
+            //    .then(function() {
+            //        notifyService.hide();
+            //        notifyService.notify('Successfully updated');
+            //    }, function(error) {
+            //        notifyService.hide();
+            //        notifyService.notify('Oops! something went wrong. Try again later');
+            //    });
         };
 
         vm.deleteItem = function(key) {
             notifyService.show('Please wait... Deleting from List');
 
-            var item = vm.list.$getRecord(key);
-            vm.list.$remove(item)
-                .then(function() {
-                    notifyService.hide();
-                    notifyService.notify('Successfully deleted');
-                }, function(error) {
-                    notifyService.hide();
-                    notifyService.notify('Oops! something went wrong. Try again later');
-                });
+            caseService.deleteCase(key);
+
+            notifyService.hide();
+
+            //var item = vm.list.$getRecord(key);
+            //vm.list.$remove(item)
+            //    .then(function() {
+            //        notifyService.hide();
+            //        notifyService.notify('Successfully deleted');
+            //    }, function(error) {
+            //        notifyService.hide();
+            //        notifyService.notify('Oops! something went wrong. Try again later');
+            //    });
         };
     })
-    .controller('CaseCreateCtrl', function($scope, $ionicHistory, $cordovaCamera, $firebaseArray, userService,
-                                           notifyService, recorderService) {
+    .controller('CaseCreateCtrl', function($scope, $ionicHistory, $cordovaCamera, $cordovaOauth, $firebaseArray,
+                                           userService, caseService, notifyService, recorderService) {
         var vm = this;
 
         vm.data = {
@@ -98,6 +151,16 @@ angular.module('dogapp.controllers', ['dogapp.services'])
 
         $ionicHistory.clearHistory();
 
+        //var OAUTH2_CLIENT_ID = '599376156128-1i8b4kdki9v9tll8m5akbih9tu4g1hkc.apps.googleusercontent.com',
+        //    OAUTH2_SCOPES = ['https://www.googleapis.com/auth/youtube'];
+
+        //$cordovaOauth.google(OAUTH2_CLIENT_ID, OAUTH2_SCOPES)
+        //    .then(function(result) {
+        //        console.log(JSON.stringify(result));
+        //    }, function(error) {
+        //        console.log(error);
+        //    });
+
         $scope.$on('modal.shown', function() {
             vm.showRecorder = true;
         });
@@ -107,43 +170,48 @@ angular.module('dogapp.controllers', ['dogapp.services'])
         };
 
         vm.recordSuccess = function(record) {
-            vm.audioTrack = record.audioUrl.replace('data:audio/wav;base64,', '');
-            vm.videoTrack = record.videoUrl.replace('data:video/webm;base64,', '');
+            vm.audioTrack = record.audioUrl.replace('data:audio/wav;base64,','');
+            vm.videoTrack = record.videoUrl.replace('data:video/webm;base64,','');
         };
 
         vm.recordError = function(err) {
             console.log(err.message);
         };
 
-        vm.snapSuccess = function(image) {
-            vm.data.image = image.replace(/data\:image\/(png|jpeg);base64,/g, '');
+        vm.snapSuccess = function(data) {
+            vm.data.image = data.replace(/data:image\/(png|jpeg);base64,/g, '');
             vm.showRecorder = false;
         };
 
-        vm.snapRetake = function() {
-            vm.data.image = null;
-        };
-
         vm.createNew = function() {
-            var item = this.data.item,
-                image = this.data.image;
+            var item = vm.data.item,
+                image = vm.data.image;
 
             if (!item) return;
 
             $scope.modal.hide();
             notifyService.show('Please wait... Creating new');
 
-            var data = {
-                uid: userService.uid(),
+            //var data = {
+            //    uid: userService.uid(),
+            //    item: item,
+            //    image: image,
+            //    isCompleted: false,
+            //    created: Date.now(),
+            //    updated: Date.now()
+            //};
+
+            //var casesRef = fb.child('cases');
+            //casesRef.push(data);
+
+            caseService.addCase({
+                $id: guid(),
                 item: item,
                 image: image,
                 isCompleted: false,
                 created: Date.now(),
                 updated: Date.now()
-            };
-
-            var casesRef = fb.child('cases');
-            casesRef.push(data);
+            });
 
             vm.data = {
                 item: '',
@@ -156,16 +224,18 @@ angular.module('dogapp.controllers', ['dogapp.services'])
     .controller('CaseCompletedCtrl', function(caseService, userService, notifyService) {
         var vm = this;
 
-        notifyService.show('Please wait... Processing');
+        //notifyService.show('Please wait... Processing');
 
-        var ref = fb.child('cases')
-            .orderByChild('uid')
-            .equalTo(userService.uid());
+        //var ref = fb.child('cases')
+        //    .orderByChild('uid')
+        //    .equalTo(userService.uid());
 
-        vm.list = new caseService(ref);
-        vm.list.$loaded(function() {
-            notifyService.hide();
-        });
+        //vm.list = new caseService(ref);
+        //vm.list.$loaded(function() {
+        //    notifyService.hide();
+        //});
+
+        vm.list = caseService;
 
         vm.deleteItem = function(key) {
             notifyService.show('Please wait... Deleting from List');

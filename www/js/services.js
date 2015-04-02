@@ -36,13 +36,46 @@ angular.module('dogapp.services', ['firebase'])
         return service;
     })
     .factory('caseService', function($firebaseArray) {
-        return $firebaseArray.$extend({
-            completed: function(flag) {
-                return this.$list.filter(function(item) {
-                    return item.isCompleted === flag;
-                });
+        var service = {},
+            cases = [];
+
+        service.getCases = function() {
+            return cases;
+        };
+
+        service.getCase = function(id) {
+            var i;
+            for (i in cases) {
+                if (cases[i].$id === id) {
+                    return cases[i];
+                }
             }
-        });
+        };
+
+        service.addCase = function(item) {
+            cases.push(item);
+        };
+
+        service.deleteCase = function(id) {
+            var item = service.getCase(id);
+            cases.splice(cases.indexOf(item), 1);
+        };
+
+        service.completed = function(flag) {
+            return cases.filter(function(item) {
+                return item.isCompleted === flag;
+            });
+        };
+
+        return service;
+
+        //return $firebaseArray.$extend({
+        //    completed: function(flag) {
+        //        return this.$list.filter(function(item) {
+        //            return item.isCompleted === flag;
+        //        });
+        //    }
+        //});
     })
     .factory('notifyService', function($rootScope, $ionicLoading) {
         var service = {};

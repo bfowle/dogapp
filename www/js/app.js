@@ -47,6 +47,15 @@ angular.module('dogapp', [
                     }
                 }
             })
+            .state('case.detail', {
+                url: '/detail/:id',
+                views: {
+                    'case-list': {
+                        templateUrl: 'templates/case-detail.html',
+                        controller: 'CaseDetailCtrl as case'
+                    }
+                }
+            })
             .state('case.completed', {
                 url: '/completed',
                 views: {
@@ -59,7 +68,7 @@ angular.module('dogapp', [
 
         $urlRouterProvider.otherwise('/case/list');
     })
-    .run(function($rootScope, $state, $ionicPlatform, $ionicHistory, /*authService, */userService, FIREBASE_URL) {
+    .run(function($rootScope, $state, $ionicPlatform, $ionicHistory, authService, userService, FIREBASE_URL) {
         $ionicPlatform.ready(function() {
             if (window.cordova && window.cordova.plugins.Keyboard) {
                 cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);

@@ -1,0 +1,28 @@
+<ion-view view-title="Case Detail">
+  <ion-nav-buttons side="left">
+    <button class="button button-clear" ng-click="$ionicGoBack($event)" ng-show="hasHistory()">
+        <em class="ion-chevron-left"></em>&nbsp;Back</button>
+     </button>
+  </ion-nav-buttons>
+  <ion-nav-buttons side="right">
+    <button class="button button-outline button-energized icon-right ion-log-out" ng-click="logout()">Logout&nbsp;</button>
+  </ion-nav-buttons>
+  <ion-content class="has-header padding" has-tabs="true" on-refresh="onRefresh()">
+    <div class="card" id="{{case.item.$id}}" >
+      <div class="item item-text-wrap">
+        <ul class="actions">
+          <li class="icon ion-checkmark-circled icon-actions" ng-click="case.markCompleted('{{case.item.$id}}')"></li>
+          <li class="icon ion-trash-b icon-actions" ng-click="case.deleteItem('{{case.item.$id}}')"></li>
+        </ul>
+        <div class="wdmd-title">Why does my dog...</div>
+        <div class="wdmd-item">{{case.item.item}}</div>
+        <div ng-if="case.item.image">
+            <thumbnail-view image="case.item.image"></thumbnail-view>
+        </div>
+        <div ng-if="case.item.video">
+            <video id="video" style="width: 100%;" ng-src="{{case.item.videoUrl}}" autoplay></video>
+        </div>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>

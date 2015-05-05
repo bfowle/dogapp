@@ -17,7 +17,7 @@
           <li class="icon ion-trash-b icon-actions" ng-click="case.deleteItem('{{item.$id}}')"></li>
         </ul>
         <div class="wdmd-title">Why does my dog...</div>
-        <div class="wdmd-item">{{item.item}}</div>
+        <div class="wdmd-item"><a ui-sref="case.detail({id: item.$id})">{{item.item}}</a></div>
         <div ng-if="item.image">
             <thumbnail-view image="item.image"></thumbnail-view>
         </div>

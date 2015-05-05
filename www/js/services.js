@@ -9,10 +9,10 @@ angular.module('dogapp.services', ['firebase'])
         auth.$onAuth(function(authData) {
             if (authData) {
                 userService.uid(authData.uid);
-                $state.go('case.list');
+                //$state.go('case.list');
             } else {
                 userService.uid(null);
-                $state.go('auth.signin');
+                //$state.go('auth.signin');
             }
         });
 
@@ -20,7 +20,7 @@ angular.module('dogapp.services', ['firebase'])
     })
     .factory('userService', function() {
         var service = {},
-            uid;
+            uid = 'foo';
 
         service.uid = function(u) {
             if (angular.isDefined(u)) {
@@ -36,46 +36,46 @@ angular.module('dogapp.services', ['firebase'])
         return service;
     })
     .factory('caseService', function($firebaseArray) {
-        var service = {},
-            cases = [];
+        //var service = {},
+        //    cases = [];
 
-        service.getCases = function() {
-            return cases;
-        };
+        //service.getCases = function() {
+        //    return cases;
+        //};
 
-        service.getCase = function(id) {
-            var i;
-            for (i in cases) {
-                if (cases[i].$id === id) {
-                    return cases[i];
-                }
-            }
-        };
-
-        service.addCase = function(item) {
-            cases.push(item);
-        };
-
-        service.deleteCase = function(id) {
-            var item = service.getCase(id);
-            cases.splice(cases.indexOf(item), 1);
-        };
-
-        service.completed = function(flag) {
-            return cases.filter(function(item) {
-                return item.isCompleted === flag;
-            });
-        };
-
-        return service;
-
-        //return $firebaseArray.$extend({
-        //    completed: function(flag) {
-        //        return this.$list.filter(function(item) {
-        //            return item.isCompleted === flag;
-        //        });
+        //service.getCase = function(id) {
+        //    var i;
+        //    for (i in cases) {
+        //        if (cases[i].$id === id) {
+        //            return cases[i];
+        //        }
         //    }
-        //});
+        //};
+
+        //service.addCase = function(item) {
+        //    cases.push(item);
+        //};
+
+        //service.deleteCase = function(id) {
+        //    var item = service.getCase(id);
+        //    cases.splice(cases.indexOf(item), 1);
+        //};
+
+        //service.completed = function(flag) {
+        //    return cases.filter(function(item) {
+        //        return item.isCompleted === flag;
+        //    });
+        //};
+
+        //return service;
+
+        return $firebaseArray.$extend({
+            completed: function(flag) {
+                return this.$list.filter(function(item) {
+                    return item.isCompleted === flag;
+                });
+            }
+        });
     })
     .factory('notifyService', function($rootScope, $ionicLoading) {
         var service = {};
